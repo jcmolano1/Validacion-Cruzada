@@ -1,0 +1,393 @@
+---
+title: "Métodos de Validación Cruzada"
+output: 
+  html_document:
+    code_folding: hide
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+defaultW <- getOption("warn") 
+options(warn = -1) 
+```
+
+#  {.tabset}
+
+## Información
+
+-   Autor: **Jose Carlos Molano de Oro** y **Juan Pablo Prada Barrios**
+
+-   Universidad: Pontificia Universidad Javeriana
+
+-   Courso: Análisis Multivariado
+
+-   Semester: 2022-3
+
+-   Profesor: Marisol Garcia Peña
+
+-   Email del Autor: jose_molano\@javeriana.edu.co
+
+## Introducción
+
+-   En regresión la validación cruzada es un método efectivo que se usa
+    para decidir, por ejemplo, el número de características subyacentes
+    y para estimar el error promedio de predicción.
+
+-   Su principal objetivo es omitir parte de los datos para construir un
+    modelo y predecir las muestras omitidas.
+
+-   La validación cruzada se puede contemplar para modelos de análisis
+    de componentes principales.
+
+### Definición (Según R. Bro - K. Kjeldahl)
+
+La validación cruzada es una técnica estándar de remuestreo utilizada en
+muchas aplicaciones quimiométricas. Los resultados de la validación
+cruzada a menudo simplifican la selección de metaparámetros, como el
+número de componentes, y también brindan una base más realista para el
+análisis residual y de influencia.
+
+### Definición para Servicios de Análisis y Minería de Datos (Microsoft Azure)
+
+La validación cruzada es una técnica que se usa a menudo en el
+aprendizaje automático para evaluar la variabilidad de un conjunto de
+datos y la confiabilidad de cualquier modelo entrenado con ellos.
+
+El componente del modelo de validación cruzada:
+
+-   Toma como entrada un conjunto de datos con etiquetas, junto con un
+    modelo de clasificación o regresión no entrenado.
+-   Divide el conjunto de datos en varios subconjuntos (plegamientos).
+-   Crea un modelo en cada plegamiento
+-   Devuelve un conjunto de estadísticas de precisión para cada
+    plegamiento.
+    -   Al comparar las estadísticas de precisión de todos los pliegues,
+        puede interpretar la calidad del conjunto de datos.
+
+El modelo de validación cruzada también devuelve probabilidades y
+resultados previstos para el conjunto de datos, por lo que podrá evaluar
+la confiabilidad de las predicciones
+
+## Row-Wise Cross-Validation
+
+Esta aproximación illustra un esquema de validación cruzada similar al
+que se usa en el software UNSCRAMBLER (Software reconocido por su uso
+simple para visualizaciones excepcionales de datos y uso avanzado de
+métodos multivariados).
+
+Se busca un modelo PCA para una matriz de datos $\mathbf{X}$ en donde
+cada segmento individual, que consiste en un número definido de muestras
+completas, se omite a su vez. El segmento estará restringido a un objeto
+(una fila de $\mathbf{X}$); por lo tanto, esto se denomina "validación
+cruzada de dejar uno fuera".
+
+### Procedimiento
+
+Para un máximo número de componentes $F$, se aplican los siguientes
+pasos:
+
+Para un número de factores, $f=1,...,F$:
+
+-   Para muestras excluidas (o filas en donde mas de una es excluida)
+    $i=1,...,I$:
+
+    -   Separe $\mathbf{X}(I \times J)$ en $\mathbf{X}^{-i}$ y
+        $(\mathbf{x}^i)^T$, donde $\mathbf{X}^{-i}$ contiene todas las
+        filas exceptuando la $i-esima$, y $(\mathbf{x}^i)^T$ es un
+        vector fila que contiene solo la $i-esima$ fila.
+
+    -   Ajuste un modelo de PCA para $\mathbf{X}^{-i}$ resolviendo:
+        $$\text{min}\mid\mid \mathbf{X}^{-i}-\mathbf{T}^{-i}\mathbf{P}^{(-i)T} \mid\mid_f^2$$
+        donde $\mid\mid \mathbf{\cdot} \mid\mid_f^2$ define la norma
+        cuadrada de Frobenius,
+        $\mathbf{I}=\mathbf{P}^{(-i)T}\mathbf{P}^{-i}$ y
+        $\mathbf{T}^{-i},\mathbf{P}^{-i}$, son de dimensión
+        $(I-1)\times f$ y $J\times f$ respectivamente donde $J$ es el
+        número de variables.
+
+    -   Proyecte $\mathbf{x}^i$ sobre las cargas y halle los puntajes de
+        las muestras excluidas como:
+        $$(\mathbf{t}^i)^T=(\mathbf{x}^i)^{T}\mathbf{P}^{-i}$$
+
+    -   Determine la variación residual de $\mathbf{x}^i$ como
+        $$(\mathbf{e}^i)^T=(\mathbf{x}^i)^T-(\mathbf{x}^i)^T\mathbf{P}^{-i}\mathbf{P}^{(-i)T}$$
+
+-   Coleccione todos los residuales en $\mathbf{E}(I\times J\times F)$;
+    una matriz $I \times J$ para cada número de componentes.
+
+-   Calcule la varianza de validación residual media y corrija para los
+    grados de libertad, resultando en la predicción residual de suma de
+    cuadrados de medias (mean predicted residual sum of squares
+    (MPRESS)):
+
+$$\text{MPRESS}(f)=\frac{1}{I(J-f)}\sum^I\sum^J e^2_{ijf}$$
+
+### Características
+
+-   La ecuación de las variaciones residuales y de los puntajes
+    residuales de muestras excluidas muestran que las muestras excluidas
+    $\mathbf{x}^i$ son usados para hallar el modelo de $\mathbf{x}^i$.
+-   Los residuales del modelo $\mathbf{x}^i$ no son independientes de
+    $\mathbf{x}^i$, esto como resultado de un sobreajuste (entre mayor
+    número de componentes hallan, menor seran los residuales). No es
+    apropiado dado que el objetivo de la validación cruzada es evitar el
+    sobreajuste mediante la estimación del modelo independientemente de
+    los datos a ser modelados.
+
+## Cross-validation of Wold
+
+El esquema de validación cruzada de wold proporciona una forma de
+calcular la predicción suma residual de cuadrados (PRESS) bajo un patrón
+de exclusión específico y un criterio para la selección del número de
+componentes.
+
+-   En este método de validación cruzada, una secuencia de elementos
+    individuales $x_{ij}$ son dejados por fuera de la diagonal y son
+    considerados como "valores faltantes".
+
+-   Se ajusta un modelo a los datos restantes y se calcula el ajuste del
+    modelo a los elementos omitidos.
+
+-   El usuario elige el número de segmentos $K$.
+
+-   El conteo de elementos se realiza por filas (figura1), de esta
+    forma, al completar K segmentos, todos los elementos habrán sido
+    omitidos una vez.
+
+```{r,echo = FALSE, fig.cap = "Fig. 1 El patrón de valores faltantes usando en la validación cruzada de Wold para $K=7$",out.width = "40%",fig.align = 'center'}
+
+knitr::include_graphics("~/Documents/Analisis Multivariado/f1.png") 
+```
+
+### Procedimiento
+
+Se busca un modelo PCA para una matrix $\mathbf{X}(I\times J)$, para
+validar el componente $f$, entonces:
+
+-   Sea $\mathbf{X}(f)$ los residuales despues de $f-1$ componentes.
+    Inicialmente $\mathbf{X}(1)=\mathbf{X}$ y subsecuentemente
+    $\mathbf{X}(f)$ es la matriz residual $\mathbf{E}(f-1)$.
+
+-   Calcule la suma de cuadrados de los elementos de $\mathbf{X}(f)$:
+
+    $$SS_{\mathbf{X}(f)}=\sum^I\sum^Jx_{ij}^2(f)$$
+
+-   Para el segmento excluido $k=1,...,K$
+
+    -   Separe $\mathbf{X}(f)$ en $\mathbf{X}^{(-k)}(f)$ y
+        $\mathbf{X}^{(k)}(f)$ en donde $\mathbf{X}^{(-k)}(f)$ contiene
+        todas las observaciones excepto los elementos del $k-esimo$
+        segmento y $\mathbf{X}^{(k)}(f)$ contiene dicho segmento.
+        -Estime el siguiente componente principal $(t^{-k},p^{-k})$
+        mediante el ajuste de $\mathbf{X}^{(-k)}(f)$ con el algoritmo
+        NIPALS
+
+    -   Calcule el modelo de $\mathbf{X}^{(k)}(f)$ usando:
+        $$\hat{x}_{ij}(f)=t_i^{-k}p_j^(-k)$$
+
+    -   Calcule la predicción suma residual de cuadrados (PRESS)
+
+    $$\text{PRESS}(f)=\sum^I\sum^J\text{e}_{ij}^2(f)=\sum^I\sum^J(x_{ij}(f)-\hat{x}_{ij}(f))^2$$
+
+-   Halle $R$:
+
+    -   $R<1$ indica que las predicciones mejoran con la inclusión del
+        último componente ($f$).
+
+    -   $R>1$ indica que el componente no mejoró los errores de
+        predicción.
+
+$$R(f)=\frac{\text{PRESS}(f)}{SS_{\mathbf{X}(f)}}$$
+
+-   Ajuste un modelo PCA $(\textbf{t,p})$ para el set de datos completos
+    $\mathbf{X}(f)$ con un componente. Determine la variación residual
+    como $\mathbf{E}(f)=\mathbf{X}(f)-\mathbf{tp}^T$
+
+-   Aumente $f$ en 1 y regrese al paso inicial.
+
+## Cross-validation of Eastment and Krzanowski (EK o $K+E$)
+
+En 1982 Eastment y Krzanowski sugieren una aproximación que puede ser
+usada para seleccionar un número factible de componentes principales.
+
+El incentivo fue crear un enfoque de validación cruzada que garantizara
+que cada punto de datos no se usara en las etapas de predicción y
+evaluación, evitando así problemas de sobreajuste.
+
+El enfoque tiene la intención de utilizar la mayor cantidad posible de
+datos originales para predecir un elemento omitido para cada posible
+elección de factores $f=1,...F(i=1,...,I\text{ y }j=1,...,J)$
+
+### Procedimiento
+
+-   Para cada combinación de $i(1,...,I)$ y $j(1,...,J)$, un modelo de
+    componentes principales es ajustado a $\mathbf{X}^{(-i)}$ y otro
+    para $\mathbf{X}^{(-j)}$, es decir, se ajustan a los datos con la
+    fila $i$ omitida y a los datos con la columna $j$ omitida. Los
+    componentes principales son representados como una descomposición de
+    valores singulares:
+
+$$\mathbf{X}^{(-i)}=\mathbf{U}^{(-i)}\mathbf{S}^{(-i)}\mathbf{V}^{(-i)T}$$
+
+$$\mathbf{X}^{(-j)}=\mathbf{U}^{(-j)}\mathbf{S}^{(-j)}\mathbf{V}^{(-j)T}$$
+
+```{r,echo = FALSE,out.width = "40%",fig.align = 'center'}
+
+knitr::include_graphics("~/Documents/Analisis Multivariado/f2.png") 
+```
+
+-   Se tiene una representación gráfica de los datos para los
+    componentes principales de $\mathbf{X}^{(-i)}$ en la figura 2, en
+    donde la zona gris designa la parte de los datos (fila $i$) y no la
+    parte del modelo. Ademas los parámetros $\mathbf{V}^{(-i)}$ y
+    $\mathbf{S}^{(-i)}$ no son influenciados por la muestra $i$. las
+    "cargas" en $\mathbf{V}^{(−i)}$ no proporcionan los medios para
+    predecir la muestra $i$. Similarmente ocurre lo anterior para la
+    muestra $j$.
+
+-   Mediante la combinación de 2 modelos, un estimador del elemento
+    $x_{ij}$ puede ser obtenido en donde es independiente del valor de
+    $x_{ij}$.
+
+-   Eastment y Krzanowski sugieren la combinación de dos modelos en
+    donde es crucial en esta aproximación para combinar dos modelos en
+    uno estimado.
+
+$$\hat{x}_{ij}(f)=\sum^fu_i^{-1}(f)\sqrt{s^{-j}(f)}\sqrt{s^{-i}(f)}v_j^{-i}(f)$$
+
+Las raíces cuadradas de los dos conjuntos de valores singulares se
+utilizan para adaptarse a las posibles diferencias en sus magnitudes.
+Para evitar problemas con indeterminaciones de signos Eastment y
+Krzanowski llamaron una "verificación de paridad", donde los productos
+de las puntuaciones y cargas de los componentes, por componente, reciben
+el mismo signo que el producto correspondiente de las puntuaciones y
+cargas de los componentes encontrados para los datos completos.
+
+-   La predicción residual de suma de cuadrados de medias (mean
+    predicted residual sum of squares (MPRESS)) expresa la diferencia de
+    medias entre el actual y el valor predecido:
+
+    -   $D_{fit}(f)=I+J-2f$ es el número de grados de libertad perdido
+        en el montaje del quinto componente
+
+    -   $D_r(f)$ es el número de grados de libertad restantes después
+        del ajuste para $f$ componentes.
+
+    -   Previo al modelado y sin centrar, $D_r(f)=IJ$, así despues de
+        ajustar $f$ factores $D_r(f)=IJ-\sum_1^f(I+J-2f)$
+
+$$\text{MPRESS}(f)=\frac{\text{MPRESS}(f-1)-\text{MPRESS}(f)}{D_{fit}(f)}\div\frac{\text{MPRESS}(f)}{D_r(f)}$$ -
+Originalmente, Eastment y Krzanowski sugirieron que el factor $f$
+debería incluirse siempre que $W(f)>1$; este umbral fue posteriormente
+modificado a un valor de 0,9 por Krzanowski
+
+## Cross-validation by Eigenvector
+
+-   En este enfoque, los modelos de los factores principales se calculan
+    con una o varias muestras omitidas y luego el modelo se usa para
+    predecir las estimaciones de las muestras omitidas
+
+-   Suponiendo, sin pérdida de generalidad, que se utiliza la validación
+    cruzada dejando uno fuera, se determina un modelo PCA a partir de
+    las muestras restantes $I−1$.
+
+-   Para la muestra excluida:
+
+    -   Se estima un valor de puntaje para la muestra excluida en un
+        sentido de mínimos cuadrados usando las variables restantes
+        $J−1$ de esa muestra y el modelo PCA donde se excluyó la j-ésima
+        fila de la matriz de carga.
+    -   Este valor de puntaje combinado con la matriz de carga PCA con
+        todas las cargas variables incluidas da una estimación del
+        elemento excluido $x_{ij}$.
+
+-   En esencia, se trata de un problema de datos faltantes en el que la
+    variable faltante se predice a partir del modelo y la observación de
+    la muestra excluye la única variable.
+
+### Procedimiento
+
+-   Omita una o varias muestras y calcule un modelo PCA $(\mathbf{T,P})$
+    sobre el resto.
+
+-   Para cada factor $f=1,...,F$, y para la muestra omitida $i=1,...,I$
+    entonces:
+
+    -   Estime su puntaje como
+
+        $$
+        \mathbf{t}^{(-j)T}=\mathbf{x}_i^{(-j)T}\mathbf{P}^{(-j)}(\mathbf{P}^{(-j)T}\mathbf{P}^{(-j)})
+        $$
+
+        donde $\mathbf{P}^{(-j)}$  es la matriz de carga $\mathbf{P}$ encontrada primer paso
+con la $j-ésima$ fila excluida. $\mathbf{x}_i^{(-j)T}$ es un vector fila que contiene la $i-esima$ fila de $\mathbf{x}$ exceptuando el $j-esimo$ elemento.
+
+    -   Estime el elemento $x^{ij}$ como $\hat{x}_{ij}(f)=\mathbf{t}^{(-j)}\mathbf{p}_j^{T}$, donde $\textbf{j}$ es la $j-esima$ fila de $\textbf{p}$
+    
+    - Halle el error predictivo del $(i,j)-esimo$ elemento: $e_{ij}(f)=x_{ij}-\hat{x}_{ij}(f)$
+
+- Estime la predicción suma residual de cuadrados (PRESS)
+
+$$\text{PRESS}(f)=\sum^I\sum^J(e_{ij}(f))^2$$
+
+### Caracteristicas de la validación cruzada de vectores propios
+
+- Los valores de la predicción suma residual de cuadrados (PRESS) mediante el método de vectores propios son independientes de los elementos predecidos.
+
+- El método del vector propio, al igual que el método por filas, tiene la ventaja de que las medidas de error específicas de la muestra, como la repetibilidad y la reproducibilidad, se pueden calcular basándose en la omisión de muestras en diferentes patrones.
+
+## EM cross-validations and EM-Wold
+
+### EM cross-validations
+
+Se presentan dichos problemas con los modelos presentados:
+
+- Se introduce un sobreajuste, porque el modelo con el que se predicen los elementos omitidos no es independiente de los elementos omitidos.
+
+- Se introduce un error adicional no intencionado porque la lógica detrás del método no es correcta
+
+Para dar solución a lo anterior, se presenta una validación cruzada basado en una mejora del procedimiento de Wold (EM-Wold)  
+
+### EM-Wold
+
+- Consiste en elimina el problema con el método original de Wold al estimar todos los componentes simultáneamente para cada segmento
+
+- El enfoque NIPALS para manejar valores faltantes deja de ser factible
+
+- Los modelos de componentes principales completos se calculan para cada número de componentes mediante imputación.
+
+### Procedimiento EM-Wold
+
+Para factores $f=1,...,F$ y para el elemento omitido $k=1,...,IJ$:
+
+- Particione los datos en $\mathbf{X}^{-k}$ y $x^{-k}$, donde $\mathbf{X}^{-k}$ contiene todos los datos excepto el $k-esimo$ elemento de $x_k$.
+
+- Ajuste un modelo de componentes principales a $\mathbf{X}^{-k}$ resolviendo: $\text{min}\mid\mid\mathbf{X}^{-k}-\textbf{TP}^T\mid\mid_f^2$.
+
+- Halle el modelo para el dataset completo como $\hat{\mathbf{X}}(f)=\mathbf{TP}^T$
+
+- Determine el residual del elemento omitido como: $e_k(f)+x_k-\hat{x}_k(f)$
+
+- Calcule la predicción suma residual de cuadrados (PRESS):
+
+$$\text{PRESS}(f)=\frac{1}{IJ}\sum^{k=IJ}(e_k(f))^2$$
+
+Se puede apreciar que la predicción del elemento omitido es independiente del elemento omitido, y el método de estimación no introduce ningún error adicional porque el modelo PCA se estima en un sentido de mínimos cuadrados.
+
+## Cross-validation based on an improved Eastment and Krzanowski procedure (EM-EK)
+
+## Referencias
+
+<https://learn.microsoft.com/es-es/analysis-services/data-mining/cross-validation-analysis-services-data-mining?view=asallproducts-allversions>
+
+<https://learn.microsoft.com/es-es/azure/machine-learning/component-reference/cross-validate-model>
+
+https://www.capterra.com/p/118853/The-Unscrambler-X/
+
+```{r, include=FALSE}
+options(warn = defaultW)
+```

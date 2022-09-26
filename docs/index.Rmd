@@ -386,7 +386,7 @@ Se puede apreciar que la predicción del elemento omitido es independiente del e
 
 <https://learn.microsoft.com/es-es/azure/machine-learning/component-reference/cross-validate-model>
 
-https://www.capterra.com/p/118853/The-Unscrambler-X/
+<https://www.capterra.com/p/118853/The-Unscrambler-X/>
 
 ```{r, include=FALSE}
 options(warn = defaultW)

@@ -400,6 +400,8 @@ Por lo tanto, obtenemos una proyección sobre los espacios abarcados por las pun
 
 - Bro, Rasmus & Kjeldahl, K & Smilde, A.K. & Kiers, Henk. (2008). Cross-validation of component models: A critical look at current methods. Analytical and bioanalytical chemistry. 390. 1241-51. 10.1007/s00216-007-1790-1. 
 
+- Eshghi, P. (2014). Dimensionality choice in principal components analysis via cross-validatory methods. Chemometrics and Intelligent Laboratory Systems, 130, 6–13. https://doi.org/10.1016/j.chemolab.2013.09.004
+
 ```{r, include=FALSE}
 options(warn = defaultW)
 ```

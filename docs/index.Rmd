@@ -380,13 +380,25 @@ Se puede apreciar que la predicción del elemento omitido es independiente del e
 
 ## Cross-validation based on an improved Eastment and Krzanowski procedure (EM-EK)
 
+Es una mejora del procedimiento de Eastment y Krzanowski. El método consiste en un simple remedio antes de igualar las puntuaciones y las cargas.
+
+La suposición en el enfoque de Eastment y Krzanowski es que para un elemento excluido dado, $x_{ij}$, el modelo del elemento está definido por los subespacios dados por $\mathbf{U}^{(−j)}$ y $\mathbf{V}^{(−i)}$.
+
+Luego la escala y la rotación no estan definidas inmediatamente. En orden para definir para definirlo, se halla un modelo basado en $\mathbf{U}^{(-j)}$ y $\mathbf{V}^{(-i)}$ para maximizar el ajuste de los datos que no han sido omitidos. Lo anterior es posible gracias a un modelo iterativo en donde el modelo de $\mathbf{X}^{-ij}$ es determinada por:
+
+$$\hat{\mathbf{X}}=(\mathbf{U}^{(-j)}(\mathbf{U}^{(-j)})^+)\mathbf{X}^{(-ij)}(\mathbf{V}^{(-i)}\mathbf{V}^{(-i)})^T$$
+
+Por lo tanto, obtenemos una proyección sobre los espacios abarcados por las puntuaciones y cargas dadas sin suponer que las columnas de estos están emparejadas por pares.
+
 ## Referencias
 
-<https://learn.microsoft.com/es-es/analysis-services/data-mining/cross-validation-analysis-services-data-mining?view=asallproducts-allversions>
+- <https://learn.microsoft.com/es-es/analysis-services/data-mining/cross-validation-analysis-services-data-mining?view=asallproducts-allversions>
 
-<https://learn.microsoft.com/es-es/azure/machine-learning/component-reference/cross-validate-model>
+- <https://learn.microsoft.com/es-es/azure/machine-learning/component-reference/cross-validate-model>
 
-<https://www.capterra.com/p/118853/The-Unscrambler-X/>
+- <https://www.capterra.com/p/118853/The-Unscrambler-X/>
+
+- Bro, Rasmus & Kjeldahl, K & Smilde, A.K. & Kiers, Henk. (2008). Cross-validation of component models: A critical look at current methods. Analytical and bioanalytical chemistry. 390. 1241-51. 10.1007/s00216-007-1790-1. 
 
 ```{r, include=FALSE}
 options(warn = defaultW)

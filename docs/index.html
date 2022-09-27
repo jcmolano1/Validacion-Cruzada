@@ -824,12 +824,32 @@ sentido de mínimos cuadrados.</p>
 <div id="cross-validation-based-on-an-improved-eastment-and-krzanowski-procedure-em-ek" class="section level2">
 <h2>Cross-validation based on an improved Eastment and Krzanowski
 procedure (EM-EK)</h2>
+<p>Es una mejora del procedimiento de Eastment y Krzanowski. El método
+consiste en un simple remedio antes de igualar las puntuaciones y las
+cargas.</p>
+<p>La suposición en el enfoque de Eastment y Krzanowski es que para un
+elemento excluido dado, <span class="math inline">\(x_{ij}\)</span>, el
+modelo del elemento está definido por los subespacios dados por <span class="math inline">\(\mathbf{U}^{(−j)}\)</span> y <span class="math inline">\(\mathbf{V}^{(−i)}\)</span>.</p>
+<p>Luego la escala y la rotación no estan definidas inmediatamente. En
+orden para definir para definirlo, se halla un modelo basado en <span class="math inline">\(\mathbf{U}^{(-j)}\)</span> y <span class="math inline">\(\mathbf{V}^{(-i)}\)</span> para maximizar el
+ajuste de los datos que no han sido omitidos. Lo anterior es posible
+gracias a un modelo iterativo en donde el modelo de <span class="math inline">\(\mathbf{X}^{-ij}\)</span> es determinada por:</p>
+<p><span class="math display">\[\hat{\mathbf{X}}=(\mathbf{U}^{(-j)}(\mathbf{U}^{(-j)})^+)\mathbf{X}^{(-ij)}(\mathbf{V}^{(-i)}\mathbf{V}^{(-i)})^T\]</span></p>
+<p>Por lo tanto, obtenemos una proyección sobre los espacios abarcados
+por las puntuaciones y cargas dadas sin suponer que las columnas de
+estos están emparejadas por pares.</p>
 </div>
 <div id="referencias" class="section level2">
 <h2>Referencias</h2>
-<p><a href="https://learn.microsoft.com/es-es/analysis-services/data-mining/cross-validation-analysis-services-data-mining?view=asallproducts-allversions" class="uri">https://learn.microsoft.com/es-es/analysis-services/data-mining/cross-validation-analysis-services-data-mining?view=asallproducts-allversions</a></p>
-<p><a href="https://learn.microsoft.com/es-es/azure/machine-learning/component-reference/cross-validate-model" class="uri">https://learn.microsoft.com/es-es/azure/machine-learning/component-reference/cross-validate-model</a></p>
-<p><a href="https://www.capterra.com/p/118853/The-Unscrambler-X/" class="uri">https://www.capterra.com/p/118853/The-Unscrambler-X/</a></p>
+<ul>
+<li><p><a href="https://learn.microsoft.com/es-es/analysis-services/data-mining/cross-validation-analysis-services-data-mining?view=asallproducts-allversions" class="uri">https://learn.microsoft.com/es-es/analysis-services/data-mining/cross-validation-analysis-services-data-mining?view=asallproducts-allversions</a></p></li>
+<li><p><a href="https://learn.microsoft.com/es-es/azure/machine-learning/component-reference/cross-validate-model" class="uri">https://learn.microsoft.com/es-es/azure/machine-learning/component-reference/cross-validate-model</a></p></li>
+<li><p><a href="https://www.capterra.com/p/118853/The-Unscrambler-X/" class="uri">https://www.capterra.com/p/118853/The-Unscrambler-X/</a></p></li>
+<li><p>Bro, Rasmus &amp; Kjeldahl, K &amp; Smilde, A.K. &amp; Kiers,
+Henk. (2008). Cross-validation of component models: A critical look at
+current methods. Analytical and bioanalytical chemistry. 390. 1241-51.
+10.1007/s00216-007-1790-1.</p></li>
+</ul>
 </div>
 </div>
 
